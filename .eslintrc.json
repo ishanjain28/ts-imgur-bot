@@ -9,6 +9,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "no-console": "off",
         "indent": [
             "warn",
             "space"
