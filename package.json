@@ -1,0 +1,36 @@
+{
+  "name": "imgur-bot",
+  "version": "1.0.0",
+  "description": "Imgur bot on Telegram",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishanjain28/imgur-bot.git"
+  },
+  "keywords": [
+    "Imgur",
+    "telegram"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishanjain28/imgur-bot/issues"
+  },
+  "homepage": "https://github.com/ishanjain28/imgur-bot#readme",
+  "dependencies": {
+    "chalk": "^2.0.1",
+    "express": "^4.15.3",
+    "node-telegram-bot-api": "^0.27.1",
+    "typescript": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/chalk": "^0.4.31",
+    "@types/node": "^8.0.17",
+    "@types/node-telegram-bot-api": "^0.27.0",
+    "eslint": "^4.3.0",
+    "typescript-eslint-parser": "^4.0.0"
+  }
+}
