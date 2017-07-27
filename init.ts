@@ -10,12 +10,12 @@ let TOKEN = "",
         "error": chalk.red
     };
 
-export default function init() {
+export  function init() {
 
     let u = new Utils();
 
     // Initalise Logger
-    ["warn", "error", "log"].forEach((method : string) => {
+    ["warn", "error", "info"].forEach((method : string) => {
         var old = console[method].bind(console);
         console[method] = function () {
             old.apply(console, [colorMapping[method](new Date().toISOString(), u.ObjectToArray(arguments))])

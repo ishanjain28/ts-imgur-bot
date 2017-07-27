@@ -1,22 +1,27 @@
 import tbot = require('node-telegram-bot-api');
 import app = require('express');
+import {init} from './init'
 
-class Bot {
-    constructor(token : string) {
-        const bot = new tbot(token)
+// Initalize Program
+init()
 
-        bot.onText('/\/(.+)/', (msg : any, match : any) => {
+const TOKEN = process.env.TOKEN;
 
-            const chatID = msg.chat.id;
+const bot = new tbot(TOKEN, {polling: true});
 
-            switch (match[0]) {
-                case "/start":
-                case "/help":
-                default:
-                    bot.sendMessage(chatID, "Invalid Command, Type /help to get help");
-            }
-        });
+bot
+    .getMe()
+    .then(me => {
+        console.info(`Authorized on ${me.first_name}(${me.username})`);
+    }, (error) => {
+        console.error(error)
+    });
 
-    }
+bot.onText(/\/(.+)/, (msg, match) => {
+    console.log(match);
+    console.log(msg)
+});
 
-}
+bot.on('message', (msg, match) => {
+    console.log(msg, match)
+})
