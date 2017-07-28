@@ -76,9 +76,6 @@ export function startServer(db: Db) {
 
     app.use(logger('dev'));
 
-    app.use(function(req, res, next) {
-      next();
-    })
 
     const httpsServer = https.createServer({
         key: readFileSync("privatekey.key", "utf8"),
