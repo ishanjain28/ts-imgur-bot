@@ -3,46 +3,75 @@ import * as https from "https";
 import {readFileSync} from "fs";
 var logger = require('morgan');
 import {Db} from "mongodb";
-var path = require('path');
+import * as path from "path";
+import * as fs from "fs";
+import * as bodyParser from "body-parser";
+import * as bcrypt from "bcrypt";
 var axios = require('axios');
 
 export function startServer(db: Db) {
     const app = express();
 
-    app.get("/imgur_oauth", (req, res, next)=> {
-      res.sendFile(path.join(__dirname + "./../public/imgur_oauth.html"));
+    app.use(bodyParser.urlencoded({extended: false}));
+
+    app.get("/imgur_oauth", (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        fs.readFile(path.join("templates", "oauth_callback_page.html"), (err, file) => {
+            if (err) {
+                console.error("Error in reading oauth_callback_page", err);
+            } else {
+                res.write(file);
+                res.end();
+            }
+        });
     });
 
-    app.get("/catchtoken", (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        if (req.query && req.query.access_token && req.query.refresh_token && req.query.account_username && req.query.account_id && req.query.state) {
 
-        // TODO:Hash the token and store it in Database along with username and refresh token.
-          db.collection('imgurBot').insertOne({
-            username: req.query.account_username,
-            access_token: req.query.access_token,
-            refresh_token: req.query.refresh_token,
-            telegram_user_id: req.query.state
-          }, function(err, r) {
-              if(err) {
-                return console.log(err);
-              }
+    app.post("/imgur_oauth", (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
-              axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
-                chat_id: req.query.state,
-                text: 'You are successfully Logged In.'
-              }).then(function(res) {
-                  console.log('msg sent');
-                })
-                .catch(function(err) {
-                  console.log(err);
+        if (req.body && req.body.access_token && req.body.refresh_token && req.body.account_username && req.body.account_id && req.body.state) {
+
+            const users = db.collection("imgurBot");
+            var chat_id = req.body.state.split("-")[1];
+            users.updateOne(
+                {_id: req.body.state.split("-")[0]},
+                {
+                    _id: req.body.state.split("-")[0],
+                    iusername: req.body.account_username,
+                    tchatid: req.body.state.split("-")[1],
+                    iaccountid: req.body.account_id,
+                }, (err, result) => {
+                    if (err) {
+                        console.error("Error in storing oauth information", err);
+                        res.status(500).write("Internal Server Error");
+                        res.end();
+                    }
+
+                    if (result.result.ok) {
+                        res.status(200).write("OK");
+
+                        axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+                            chat_id: chat_id,
+                            text: 'You are successfully Logged In.'
+                          }).then(function(res) {
+                              console.log('msg sent');
+                              res.end();
+                            })
+                            .catch(function(err) {
+                              console.log(err);
+                              res.end();
+                            });
+
+                    } else {
+                        res.status(500).write("Internal Server Error");
+                        res.end();
+                    }
                 });
-              });
-        } else {
-          console.log('error in logging user');
-        }
 
-        // send url to redirect after login
-         res.send(null);
+        } else {
+            res.status(400).write("Bad Request");
+            res.end();
+            console.log('error');
+        }
     });
 
     app.use(logger('dev'));

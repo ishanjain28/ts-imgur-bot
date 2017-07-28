@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/ishanjain28/imgur-bot#readme",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
     "chalk": "^2.0.1",
     "express": "^4.15.3",
     "mongodb": "^2.2.30",

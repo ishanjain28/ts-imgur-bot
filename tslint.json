@@ -9,8 +9,7 @@
     "only-arrow-functions": false,
     "object-literal-sort-keys": false,
     "max-line-length": [
-      true,
-      140
+      false
     ],
     "arrow-parens": false,
     "ordered-imports": false,

@@ -20,13 +20,14 @@ export function startBot(db) {
     bot.onText(/\/(.+)/, (msg, match) => {
 
         const chatid = msg.chat.id;
+        const username = msg.from.username;
         switch (match[1]) {
             case "start":
                 break;
             case "login":
                 bot
-                    .sendMessage(chatid, `Open this url in a window and Login with your imgur account\n${imgur.Authorize(chatid)}`);
-                    // .then(console.log, console.log);
+                    .sendMessage(chatid, `Open this url in a browser and Login with your imgur account\n${imgur.Authorize(`${username}-${chatid}`)}`);
+                // .then(console.log, console.log);
                 break;
             case "help":
                 break;
