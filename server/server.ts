@@ -1,11 +1,13 @@
 import * as express from "express";
 import * as https from "https";
 import {readFileSync} from "fs";
+var logger = require('morgan');
 import {Db} from "mongodb";
 import * as path from "path";
 import * as fs from "fs";
 import * as bodyParser from "body-parser";
 import * as bcrypt from "bcrypt";
+var axios = require('axios');
 
 export function startServer(db: Db) {
     const app = express();
@@ -28,8 +30,8 @@ export function startServer(db: Db) {
 
         if (req.body && req.body.access_token && req.body.refresh_token && req.body.account_username && req.body.account_id && req.body.state) {
 
-            const users = db.collection("users");
-
+            const users = db.collection("imgurBot");
+            var chat_id = req.body.state.split("-")[1];
             users.updateOne(
                 {_id: req.body.state.split("-")[0]},
                 {
@@ -45,9 +47,20 @@ export function startServer(db: Db) {
                     }
 
                     if (result.result.ok) {
-
                         res.status(200).write("OK");
-                        res.end();
+
+                        axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+                            chat_id: chat_id,
+                            text: 'You are successfully Logged In.'
+                          }).then(function(res) {
+                              console.log('msg sent');
+                              res.end();
+                            })
+                            .catch(function(err) {
+                              console.log(err);
+                              res.end();
+                            });
+
                     } else {
                         res.status(500).write("Internal Server Error");
                         res.end();
@@ -57,8 +70,12 @@ export function startServer(db: Db) {
         } else {
             res.status(400).write("Bad Request");
             res.end();
+            console.log('error');
         }
     });
+
+    app.use(logger('dev'));
+
 
     const httpsServer = https.createServer({
         key: readFileSync("privatekey.key", "utf8"),
@@ -69,7 +86,6 @@ export function startServer(db: Db) {
         if (error) {
             throw console.error("Error in starting HTTP Server", error);
         }
-
         console.info(`Server Started on PORT ${process.env.PORT}`);
     });
 
