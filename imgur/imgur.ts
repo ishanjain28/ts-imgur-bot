@@ -7,8 +7,8 @@ export class Imgur {
         this.ClientID = TOKEN;
     }
 
-    public Authorize() {
-        return `https://api.imgur.com/oauth2/authorize?client_id=${this.ClientID}&response_type=token`;
+    public Authorize(id) {
+        return `https://api.imgur.com/oauth2/authorize?client_id=${this.ClientID}&response_type=token&state=${id}`;
 
     }
 

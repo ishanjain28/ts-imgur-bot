@@ -4,11 +4,11 @@ import tbot = require("node-telegram-bot-api");
 const TOKEN = process.env.TOKEN;
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 
+export const bot = new tbot(TOKEN, {polling: true});
+export const imgur = new Imgur(IMGUR_CLIENT_ID);
+
 export function startBot(db) {
-
-    const bot = new tbot(TOKEN, {polling: true});
-    const imgur = new Imgur(IMGUR_CLIENT_ID);
-
+    console.log('here');
     bot
         .getMe()
         .then(me => {
@@ -25,7 +25,7 @@ export function startBot(db) {
                 break;
             case "login":
                 bot
-                    .sendMessage(chatid, `Open this url in a window and Login with your imgur account\n${imgur.Authorize()}`);
+                    .sendMessage(chatid, `Open this url in a window and Login with your imgur account\n${imgur.Authorize(chatid)}`);
                     // .then(console.log, console.log);
                 break;
             case "help":
