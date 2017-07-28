@@ -2,18 +2,62 @@ import * as express from "express";
 import * as https from "https";
 import {readFileSync} from "fs";
 import {Db} from "mongodb";
+import * as path from "path";
+import * as fs from "fs";
+import * as bodyParser from "body-parser";
+import * as bcrypt from "bcrypt";
 
 export function startServer(db: Db) {
     const app = express();
 
+    app.use(bodyParser.urlencoded({extended: false}));
+
     app.get("/imgur_oauth", (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        fs.readFile(path.join("templates", "oauth_callback_page.html"), (err, file) => {
+            if (err) {
+                console.error("Error in reading oauth_callback_page", err);
+            } else {
+                res.write(file);
+                res.end();
+            }
+        });
+    });
 
-        if (req.query && req.query.access_token && req.query.refresh_token && req.query.account_username && req.query.account_id) {
 
-        // TODO:Hash the token and store it in Database along with username and refresh token.
+    app.post("/imgur_oauth", (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
+        if (req.body && req.body.access_token && req.body.refresh_token && req.body.account_username && req.body.account_id && req.body.state) {
+
+            const users = db.collection("users");
+
+            users.updateOne(
+                {_id: req.body.state.split("-")[0]},
+                {
+                    _id: req.body.state.split("-")[0],
+                    iusername: req.body.account_username,
+                    tchatid: req.body.state.split("-")[1],
+                    iaccountid: req.body.account_id,
+                }, (err, result) => {
+                    if (err) {
+                        console.error("Error in storing oauth information", err);
+                        res.status(500).write("Internal Server Error");
+                        res.end();
+                    }
+
+                    if (result.result.ok) {
+
+                        res.status(200).write("OK");
+                        res.end();
+                    } else {
+                        res.status(500).write("Internal Server Error");
+                        res.end();
+                    }
+                });
+
+        } else {
+            res.status(400).write("Bad Request");
+            res.end();
         }
-        res.end();
     });
 
     const httpsServer = https.createServer({
@@ -30,4 +74,3 @@ export function startServer(db: Db) {
     });
 
 }
-
