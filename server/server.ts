@@ -30,8 +30,7 @@ export function startServer(db: Db) {
 
         if (req.body && req.body.access_token && req.body.refresh_token && req.body.account_username && req.body.account_id && req.body.state) {
 
-            const users = db.collection("imgurBot");
-            var chat_id = req.body.state.split("-")[1];
+            const users = db.collection("Users");
             users.updateOne(
                 {_id: req.body.state.split("-")[0]},
                 {
@@ -39,6 +38,10 @@ export function startServer(db: Db) {
                     iusername: req.body.account_username,
                     tchatid: req.body.state.split("-")[1],
                     iaccountid: req.body.account_id,
+                    iaccess_token: req.body.access_token,
+                    irefresh_token: req.body.refresh_token
+                }, {
+                    upsert: true  // insert one if none matches
                 }, (err, result) => {
                     if (err) {
                         console.error("Error in storing oauth information", err);
@@ -48,18 +51,17 @@ export function startServer(db: Db) {
 
                     if (result.result.ok) {
                         res.status(200).write("OK");
-
                         axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
-                            chat_id: chat_id,
+                            chat_id: req.body.state.split("-")[0],
                             text: 'You are successfully Logged In.'
                           }).then(function(res) {
-                              console.log('msg sent');
                               res.end();
                             })
                             .catch(function(err) {
                               console.log(err);
                               res.end();
                             });
+                        res.end();
 
                     } else {
                         res.status(500).write("Internal Server Error");
