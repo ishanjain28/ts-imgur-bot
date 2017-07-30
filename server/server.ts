@@ -1,7 +1,6 @@
 import * as express from "express";
 import * as https from "https";
 import {readFileSync} from "fs";
-var logger = require('morgan');
 import {Db} from "mongodb";
 import * as path from "path";
 import * as fs from "fs";
