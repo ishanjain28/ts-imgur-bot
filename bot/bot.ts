@@ -2,6 +2,7 @@ import {Imgur} from "./../imgur/imgur";
 import tbot = require("node-telegram-bot-api");
 import {EventEmitter} from "events";
 
+
 const TOKEN = process.env.TOKEN;
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 
@@ -72,7 +73,7 @@ bot
             .tbot
             .getFile(args.photo[1].file_id)
             .then((res)=>{
-              imgur.uploadImage(`https://api.telegram.org/file/bot${process.env.TOKEN}/${res.file_path}`, function(err, link) {
+              imgur.uploadImage(`https://api.telegram.org/file/bot${process.env.TOKEN}/${res.file_path}`, args.chat.id, function(err, link) {
                 if(err) {
                   return console.error(err);
                 }
