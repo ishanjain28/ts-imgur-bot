@@ -87,11 +87,13 @@ export function startServer(db : Db) {
                 }
             });
 
+
         } else {
             res
                 .status(400)
                 .write("Bad Request");
             res.end();
+            console.log('error');
         }
     });
 
@@ -106,7 +108,6 @@ export function startServer(db : Db) {
         if (error) {
             throw console.error("Error in starting HTTP Server", error);
         }
-
         console.info(`Server Started on PORT ${process.env.PORT}`);
     });
 

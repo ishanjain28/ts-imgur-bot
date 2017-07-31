@@ -30,7 +30,8 @@
         if (req.readyState == 4) {
             if (req.status == 200) {
 //                Redirect to bot after successfull login
-                window.location = "https://t.me/chinguimgurbot";
+                // window.location = "https://t.me/chinguimgurbot";
+                window.close();
             }
             else if (req.status == 400) {
                 alert('There was an error processing the token.')

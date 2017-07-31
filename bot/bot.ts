@@ -1,16 +1,17 @@
-import {Imgur} from "../imgur/imgur";
+import {Imgur} from "./../imgur/imgur";
 import tbot = require("node-telegram-bot-api");
 import {EventEmitter} from "events";
 
+
 const TOKEN = process.env.TOKEN;
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
+
+const imgur = new Imgur(IMGUR_CLIENT_ID);
 
 class Bot extends EventEmitter {
     public tbot : tbot;
     constructor() {
         super();
-
-        const imgur = new Imgur(IMGUR_CLIENT_ID);
 
         this.tbot = new tbot(TOKEN, {polling: true});
         this
@@ -68,11 +69,17 @@ bot.on("imgur_oauth_succeeded", (chatid, iusername) => {
 bot
     .tbot
     .on("photo", args => {
-
-        // bot
-        //     .tbot
-        //     .getFile(args.photo[3].file_id)
-        //     .then(console.log, console.log);
+        bot
+            .tbot
+            .getFile(args.photo[1].file_id)
+            .then((res)=>{
+              imgur.uploadImage(`https://api.telegram.org/file/bot${process.env.TOKEN}/${res.file_path}`, args.chat.id, function(err, link) {
+                if(err) {
+                  return console.error(err);
+                }
+                bot.tbot.sendMessage(args.chat.id, `Image was successfull uploaded. Here is it's link : ${link}`)
+              });
+            });
     });
 
 export default bot;
